@@ -51,13 +51,17 @@ def get_input():
     while True:
         try:
             reply = int(input('Enter a number: '))
-            return reply
-        except:
-            print('Its not a number, try again!')
+            if reply >= 0:
+                return reply
+            else:
+                raise ValueError
+        except ValueError:
+            print('Its not a number or its a negative number, try again!')
             continue
 
 
 def main():
+    print("Order input: r1, r2, x1, y1, x2, y2")
     r1 = get_input()
     r2 = get_input()
     x1 = get_input()
@@ -65,8 +69,8 @@ def main():
     x2 = get_input()
     y2 = get_input()
 
-    c1 = Circle(r1, x1, y1)
-    c2 = Circle(r2, x2, y2)
+    c1 = Circle(r=r1, x=x1, y=y1)
+    c2 = Circle(r=r2, x=x2, y=y2)
 
     print("Area for first circle:", c1.area())
     print("Perimeter for first circle:", c1.perimeter())
@@ -74,6 +78,8 @@ def main():
     print("Perimeter for second circle:", c2.perimeter())
 
     print(calc_intersection(x1, y1, r1, x2, y2, r2))
+
+    k = input("Press any button to exit")
 
 
 main()
