@@ -1,3 +1,5 @@
-hello
-main.c~
-Makefile~
+*.o
+*.exe
+*.d
+*.a
+*.cpp~
