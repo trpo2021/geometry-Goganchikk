@@ -5,22 +5,17 @@
 using std::cout;
 using std::endl;
 
-void processing(string command)
-{
-    normalization(command);
-
-    vector<string> details = splitting(command);
-    parser(details);
-}
-void normalization(string& command)
+string normalization(string command)
 {
     for (unsigned int i = 0; i < command.size(); i++) {
         if (isupper(command[i])) {
             command[i] = tolower(command[i]);
         }
     }
+    return command;
 }
-vector<string> splitting(string& command)
+
+vector<string> splitting(const string& command)
 {
     vector<string> details;
 
@@ -48,14 +43,15 @@ vector<string> splitting(string& command)
 
     return details;
 }
-bool numberParser(string& strNumber, double& number)
+
+bool numberParser(string strNumber, double& number)
 {
+    number = 0.0;
     for (unsigned int countPoint = 0, i = 0; i < strNumber.size(); i++) {
         if (strNumber[i] == '.') {
             if (++countPoint > 1) {
                 return false;
             }
-            strNumber[i] = ',';
         } else if ((strNumber[i] != '-') && (not isdigit(strNumber[i]))) {
             return false;
         }
@@ -65,133 +61,76 @@ bool numberParser(string& strNumber, double& number)
     return true;
 }
 
-void parser(vector<string>& details)
+bool parser(vector<Circle>& circles, string command)
 {
+    command = normalization(command);
+
+    vector<string> details = splitting(command);
     if (details.size() != 0) {
         if (details[0] == "circle") {
             double x, y, radius;
-            circleParser(details, x, y, radius);
-            circleInfo(x, y, radius);
-        } else if (details[0] == "triangle") {
-            double x1, y1;
-            double x2, y2;
-            double x3, y3;
-            triangleParser(details, x1, y1, x2, y2, x3, y3);
-            triangleInfo(x1, y1, x2, y2, x3, y3);
+            if (circleParser(details, x, y, radius)) {
+                circleInfo(x, y, radius);
+
+                circles.push_back(Circle(x, y, radius));
+
+                return true;
+            }
         } else {
-            cout << "Ошибка: неизвестная фигура." << endl;
+            cout << "Error:neizvestnaya figura" << endl;
         }
     } else {
-        cout << "Ошибка: пустая строка." << endl;
+        cout << "Error: pustaya stroka" << endl;
     }
+
+    return false;
 }
-void circleParser(vector<string>& details, double& x, double& y, double& radius)
+bool circleParser(vector<string>& details, double& x, double& y, double& radius)
 {
     if ((details.size() < 2) || (details[1] != "(")) {
-        cout << "Ошибка: не найдена открывающаяся скобка \'(\'." << endl;
-        return;
+        cout << "Error: ne nayden: \'(\'." << endl;
+        return false;
     }
+
     if ((details.size() > 2) && (!numberParser(details[2], x))) {
-        cout << "Ошибка: ожидалось число: координата X." << endl;
-        return;
+        cout << "Error: ne nayden: X." << endl;
+        return false;
     }
+
     if ((details.size() > 3) && (!numberParser(details[3], y))) {
-        cout << "Ошибка: ожидалось число: координата Y." << endl;
-        return;
+        cout << "Error: ne nayden: Y." << endl;
+        return false;
     }
+
     if ((details.size() < 5) || (details[4] != ",")) {
-        cout << "Ошибка: не найдена запятая \',\'." << endl;
-        return;
+        cout << "Error: ne nayden: \',\'." << endl;
+        return false;
     }
+
     if ((details.size() > 5) && (!numberParser(details[5], radius))) {
-        cout << "Ошибка: ожидалось число: raidus." << endl;
-        return;
+        cout << "Error: ne nayden: raidus." << endl;
+        return false;
     }
     if (radius < 0.0) {
-        cout << "Ошибка: радиус не может быть отрицательным.";
+        cout << "Error: otrizatel. radius";
     }
+
     if ((details.size() < 7) || (details[6] != ")")) {
-        cout << "Ошибка: не найдена закрывающаяся скобка \')\'." << endl;
-        return;
+        cout << "Error: ne nayden: \')\'." << endl;
+        return false;
     }
+
     if (details.size() > 7) {
-        cout << "Ошибка: " << endl;
+        cout << "Error: " << endl;
         for (unsigned int i = 7; i < details.size(); i++) {
             cout << "\"" << details[i] << "\"";
             if ((int)(i + 1) != (int)details.size()) {
                 cout << ", ";
             }
         }
-        cout << " - неизвестные токены." << endl;
-        return;
+        cout << " - neizvestn. token" << endl;
+        return false;
     }
-}
-void triangleParser(
-        vector<string>& details,
-        double& x1,
-        double& y1,
-        double& x2,
-        double& y2,
-        double& x3,
-        double& y3)
-{
-    if ((details.size() < 2) || (details[1] != "(")) {
-        cout << "Ошибка: не найдена открывающаяся скобка \'(\'." << endl;
-        return;
-    }
-    if ((details.size() < 3) || (details[2] != "(")) {
-        cout << "Ошибка: не найдена открывающаяся скобка \'(\'." << endl;
-        return;
-    }
-    if ((details.size() > 3) && (!numberParser(details[3], x1))) {
-        cout << "Ошибка: ожидалось число: координата X1." << endl;
-        return;
-    }
-    if ((details.size() > 4) && (!numberParser(details[4], y1))) {
-        cout << "Ошибка: ожидалось число: координата Y1." << endl;
-        return;
-    }
-    if ((details.size() < 6) || (details[5] != ",")) {
-        cout << "Ошибка: не найдена запятая \',\'." << endl;
-        return;
-    }
-    if ((details.size() > 6) && (!numberParser(details[6], x2))) {
-        cout << "Ошибка: ожидалось число: координата X2." << endl;
-        return;
-    }
-    if ((details.size() > 7) && (!numberParser(details[7], y2))) {
-        cout << "Ошибка: ожидалось число: координата Y2." << endl;
-        return;
-    }
-    if ((details.size() < 9) || (details[8] != ",")) {
-        cout << "Ошибка: не найдена запятая \',\'." << endl;
-        return;
-    }
-    if ((details.size() > 9) && (!numberParser(details[9], x3))) {
-        cout << "Ошибка: ожидалось число: координата X3." << endl;
-        return;
-    }
-    if ((details.size() > 10) && (!numberParser(details[10], y3))) {
-        cout << "Ошибка: ожидалось число: координата Y3." << endl;
-        return;
-    }
-    if ((details.size() < 12) || (details[11] != ")")) {
-        cout << "Ошибка: не найдена закрывающаяся скобка \')\'." << endl;
-        return;
-    }
-    if ((details.size() < 13) || (details[12] != ")")) {
-        cout << "Ошибка: не найдена закрывающаяся скобка \')\'." << endl;
-        return;
-    }
-    if (details.size() > 13) {
-        cout << "Ошибка: " << endl;
-        for (unsigned int i = 13; i < details.size(); i++) {
-            cout << "\"" << details[i] << "\"";
-            if ((int)(i + 1) != (int)details.size()) {
-                cout << ", ";
-            }
-        }
-        cout << " - неизвестные токены." << endl;
-        return;
-    }
+
+    return true;
 }
